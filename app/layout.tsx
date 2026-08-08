@@ -25,23 +25,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-          {/* <TooltipProvider>{children}</TooltipProvider> */}
-          <ClerkProvider>
-          {/* <header className="flex justify-end items-center p-4 gap-4 h-16">
-            <Show when="signed-out">
-              <SignInButton />
-              <SignUpButton>
-                <button className="bg-[#6c47ff] text-white rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 cursor-pointer">
-                  Sign Up
-                </button>
-              </SignUpButton>
-            </Show>
-            <Show when="signed-in">
-              <UserButton />
-            </Show>
-          </header> */}
-           <TooltipProvider>{children}</TooltipProvider>
+      <body className="min-h-full flex flex-col dark" >
+        {/* <TooltipProvider>{children}</TooltipProvider> */}
+        <ClerkProvider appearance={{
+          variables: {
+            colorPrimary: "#e78a53",
+            colorBackground: "#f3f4f6",   // or whatever your intended value was
+            colorForeground: "#111827",         // likely what you meant — common Tailwind gray-900
+            colorMutedForeground: "#6b7280",
+            colorInput: "#f3f4f6"
+          }
+        }}>
+          <TooltipProvider>{children}</TooltipProvider>
         </ClerkProvider>
       </body>
     </html>
