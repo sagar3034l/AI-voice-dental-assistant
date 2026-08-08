@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ClerkProvider, Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -28,7 +27,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col dark" >
         {/* <TooltipProvider>{children}</TooltipProvider> */}
         <ClerkProvider appearance={{
-          variables: {
+          variables: {  
             colorPrimary: "#e78a53",
             colorBackground: "#f3f4f6",   // or whatever your intended value was
             colorForeground: "#111827",         // likely what you meant — common Tailwind gray-900
