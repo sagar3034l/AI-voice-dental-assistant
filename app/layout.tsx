@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ClerkProvider, Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import UserSync from "@/components/UserSync";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -35,7 +36,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             colorInput: "#f3f4f6"
           }
         }}>
-          <TooltipProvider>{children}</TooltipProvider>
+          <TooltipProvider>
+            <UserSync />
+            {children}
+            </TooltipProvider>
         </ClerkProvider>
       </body>
     </html>
