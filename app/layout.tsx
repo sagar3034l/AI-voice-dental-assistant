@@ -4,6 +4,7 @@ import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ClerkProvider, Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import UserSync from "@/components/UserSync";
+import TanstackProvider from "@/components/providers/TanstackProvider";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -21,27 +22,30 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col dark" >
-        {/* <TooltipProvider>{children}</TooltipProvider> */}
-        <ClerkProvider appearance={{
-          variables: {  
-            colorPrimary: "#e78a53",
-            colorBackground: "#f3f4f6",   // or whatever your intended value was
-            colorForeground: "#111827",         // likely what you meant — common Tailwind gray-900
-            colorMutedForeground: "#6b7280",
-            colorInput: "#f3f4f6"
-          }
-        }}>
-          <TooltipProvider>
-            <UserSync />
-            {children}
+    <ClerkProvider appearance={{
+      variables: {
+        colorPrimary: "#e78a53",
+        colorBackground: "#f3f4f6",   // or whatever your intended value was
+        colorForeground: "#111827",         // likely what you meant — common Tailwind gray-900
+        colorMutedForeground: "#6b7280",
+        colorInput: "#f3f4f6"
+      }
+    }}>
+      <TanstackProvider>
+        <html
+          lang="en"
+          className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+        >
+          <body className="min-h-full flex flex-col dark" >
+            {/* <TooltipProvider>{children}</TooltipProvider> */}
+
+            <TooltipProvider>
+              <UserSync />
+              {children}
             </TooltipProvider>
-        </ClerkProvider>
-      </body>
-    </html>
+          </body>
+        </html>
+      </TanstackProvider>
+    </ClerkProvider>
   );
 }
