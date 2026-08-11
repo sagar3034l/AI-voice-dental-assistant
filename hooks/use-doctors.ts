@@ -30,7 +30,7 @@ export function useUpdateDoctor(){
     onSuccess: ()=>{
       queryClient.invalidateQueries({queryKey:['getDoctors']})
     },
-    onError: (error)=> console.log("Failed to update doctor",error)
+    onError: (error)=> console.log("Failed to update doctor",error),
   })
 }
 
