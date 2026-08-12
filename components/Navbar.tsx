@@ -37,7 +37,7 @@ function Navbar() {
                             : "text-muted-foreground hover:text-foreground"
                         }`}>
                         <MicIcon className="size-4" />
-                        <span className="hidden md:inline">Appointments</span>
+                        <span className="hidden md:inline">Voice</span>
                     </Link>
 
                     <Link href="/pro" className={`flex items-center gap-2 transition-colors ${pathname === "/pro"
