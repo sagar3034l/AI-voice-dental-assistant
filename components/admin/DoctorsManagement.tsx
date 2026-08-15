@@ -75,7 +75,6 @@ function DoctorsManagement() {
                                         </div>
                                     </div>
                                 </div>
-
                              <div className='flex items-center gap-3'>
                                 <div className='text-center'>
                                     <div className='font-semibold text-primary'>

@@ -19,7 +19,7 @@ function AdminDashboardClient() {
         totalDoctors: doctors.length,
         activeDoctors: doctors.filter((doc) => doc.isActive === true).length,
         totalAppointments: appointments.length,
-        completedAppointments: appointments.map((app) => app.status === "COMPLETED").length
+        completedAppointments: appointments.filter((app) => app.status === "COMPLETED").length
     };
 
     if (doctorLoading || appointmentsLoading) {

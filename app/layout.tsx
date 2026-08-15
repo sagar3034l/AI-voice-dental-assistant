@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ClerkProvider, Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import UserSync from "@/components/UserSync";
 import TanstackProvider from "@/components/providers/TanstackProvider";
+import { Toaster } from "sonner";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -41,6 +42,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 
             <TooltipProvider>
               <UserSync />
+              <Toaster />
               {children}
             </TooltipProvider>
           </body>

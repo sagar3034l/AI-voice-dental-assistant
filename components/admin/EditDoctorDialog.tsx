@@ -44,7 +44,7 @@ function EditDoctorDialog({ isOpen,onClose,doctor}:EditDoctorDiallogProps) {
     }
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="sm:max-w-[550px]">
+        <DialogContent className="sm:max-w-137.5">
             <DialogHeader>
               <DialogTitle>
                  Edit doctor
