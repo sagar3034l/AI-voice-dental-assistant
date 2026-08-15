@@ -8,10 +8,10 @@ import { revalidatePath } from "next/cache"
 export async function getDoctors() {
     try {
         const doctors = await prisma.doctor.findMany({
-            include:{
-                _count: {select: {appointment: true}}
+            include: {
+                _count: { select: { appointment: true } }
             },
-            orderBy: {createdAt:"desc"}
+            orderBy: { createdAt: "desc" }
         })
 
         return doctors.map((doctor) => ({
@@ -32,23 +32,23 @@ interface CreateDoctorInput {
     isActive: boolean
 }
 
-export async function createDoctor(input:CreateDoctorInput) {
+export async function createDoctor(input: CreateDoctorInput) {
     try {
-        if(!input.name || !input.email){
+        if (!input.name || !input.email) {
             throw new Error("Name and email is missing");
         }
         const doctor = await prisma.doctor.create({
-            data:{
+            data: {
                 ...input,
-                imageUrl: generateAvatar(input.name,input.gender)
+                imageUrl: generateAvatar(input.name, input.gender)
             }
         })
         revalidatePath("/admin")
         return doctor
-    } catch (error:any) {
+    } catch (error: any) {
         console.error(error)
 
-        if(error?.code === "p2002"){
+        if (error?.code === "p2002") {
             throw new Error("A doctor with this email already exists")
         }
 
@@ -56,38 +56,37 @@ export async function createDoctor(input:CreateDoctorInput) {
     }
 }
 
-interface UpdateDoctorInput extends Partial<CreateDoctorInput>
-{
+interface UpdateDoctorInput extends Partial<CreateDoctorInput> {
     id: string
 }
 
 export async function updateDoctor(input: UpdateDoctorInput) {
     try {
         // validate
-        if(!input.name || !input.email){
+        if (!input.name || !input.email) {
             throw new Error("Name and email are required")
         }
 
         const currentDoctor = await prisma.doctor.findUnique({
-            where: {id: input.id}, select: {email: true}
+            where: { id: input.id }, select: { email: true }
         })
 
-        if(!currentDoctor){
+        if (!currentDoctor) {
             throw new Error("Doctor not found")
         }
 
-        if(input.email !== currentDoctor.email){
+        if (input.email !== currentDoctor.email) {
             const existingDoctor = await prisma.doctor.findUnique({
-                where: {email: input.email}
+                where: { email: input.email }
             })
 
-            if(existingDoctor){
+            if (existingDoctor) {
                 throw new Error("A doctor with this email alrady exists")
             }
         }
-        
+
         const doctor = await prisma.doctor.update({
-            where: {id: input.id},
+            where: { id: input.id },
             data: {
                 name: input.name,
                 email: input.email,
@@ -96,10 +95,32 @@ export async function updateDoctor(input: UpdateDoctorInput) {
                 gender: input.gender,
                 isActive: input.isActive
             }
-        }) 
+        })
 
         return doctor;
 
+    } catch (error) {
+        console.error(error)
+        throw new Error("Update failed")
+    }
+}
+
+
+export async function getAvailableDoctors() {
+    try {
+        const doctors = await prisma.doctor.findMany({
+            where: { isActive: true },
+            include: {
+                _count: {
+                    select: { appointment: true }
+                },
+            },
+            orderBy: { name: "asc" }
+        })
+        return doctors.map((doc) => ({
+            ...doc,
+            appointmentCount: doc._count.appointment
+        }))
     } catch (error) {
         console.error(error)
         throw new Error("Update failed")

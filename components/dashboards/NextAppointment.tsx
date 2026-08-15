@@ -19,7 +19,7 @@ async function NextAppointment() {
   if (!nextAppointMent) return <NoNextAppointments />
 
   const appointmentDate = parseISO(nextAppointMent.date)
-  const formattedDate = format(appointmentDate, "EEE, MMMM d, YYYY")
+  const formattedDate = format(appointmentDate, "EEE, MMMM d, yyyy")
 
   const isToday = isSameDay(appointmentDate, new Date());
 
