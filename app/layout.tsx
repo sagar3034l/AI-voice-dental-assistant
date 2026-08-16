@@ -41,7 +41,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             {/* <TooltipProvider>{children}</TooltipProvider> */}
 
             <TooltipProvider>
-              <UserSync />
+              <UserSync /> 
               <Toaster />
               {children}
             </TooltipProvider>

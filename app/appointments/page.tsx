@@ -1,5 +1,6 @@
 "use client"
 
+import { AppointmentConfirmationModal } from "@/components/appointments/AppointmentConfirmationModal";
 import BookedConfirmationStep from "@/components/appointments/BookedConfirmationStep";
 import DoctorSelectionStep from "@/components/appointments/DoctorSelectionStep";
 import ProgressSteps from "@/components/appointments/ProgressSteps";
@@ -8,6 +9,7 @@ import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardDescription } from "@/components/ui/card";
 import { useBookAppointments, useUserAppointment } from "@/hooks/use-appointments";
 import { APPOINTMENT_TYPES } from "@/lib/utils";
+import { format } from "date-fns";
 import { CalendarClock, CalendarX2, Clock3, Loader2, Stethoscope } from "lucide-react";
 import { useState } from "react"
 import { toast } from 'sonner'
@@ -45,8 +47,30 @@ function AppointmentPage() {
             time: selectedTime,
             reason: appointmentType?.name
         }, {
-            onSuccess: (appointment) => {
+            onSuccess: async (appointment) => {
                 setBookedAppointments(appointment)
+
+                try {
+                    const emailResponse = await fetch("/api/send-appointment-email", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            userEmail: appointment.patientEmail,
+                            doctorName: appointment.doctorName,
+                            appointmentDate: format(new Date(appointment.date), "EEEE, MMMM d, yyyy"),
+                            appointmentTime: appointment.time,
+                            appointmentType: appointmentType?.name,
+                            duration: appointmentType?.duration,
+                            price: appointmentType?.price,
+                        }),
+                    });
+
+                    if (!emailResponse.ok) console.error("Failed to send confirmation email");
+                } catch (error) {
+                    console.error("Error sending confirmation email:", error);
+                }
 
                 setShowConfirmed(true);
                 setSelectedDentistId(null);
@@ -55,9 +79,9 @@ function AppointmentPage() {
                 setSelectedType("")
                 setCurrentStep(1)
             },
-            onError: (error)=>toast.error(`Failed to book appointment,${error.message}`)
+            onError: (error) => toast.error(`Failed to book appointment,${error.message}`)
         },
-    )
+        )
     }
 
 
@@ -107,6 +131,19 @@ function AppointmentPage() {
                     />
                 )}
             </div>
+
+            {bookedAppointments && (
+                <AppointmentConfirmationModal
+                   open={showConfirmed}
+                   onOpenChange={setShowConfirmed}
+                   appointmentDetails={{
+                    doctorName: bookedAppointments.doctorName,
+                    appointmentDate: format(new Date(bookedAppointments.date),"EEEE, MMMM d, yyyy"),
+                    appointmentTime: bookedAppointments.time,
+                    userEmail: bookedAppointments.patientEmail
+                   }}
+                 />
+            )}
 
             <div className="max-w-7xl px-6 pb-12">
                 <div className="mb-4 flex items-center justify-between gap-4">

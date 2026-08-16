@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 
 
 
+
 async function propage(){
     const user = await currentUser();
 
@@ -47,11 +48,11 @@ async function propage(){
                     Select the perfect plan for your dental care needs. All plans include secure access and bank-level encryption
                   </p>
               </div>
-              <PricingTable />
+              <PricingTable newSubscriptionRedirectUrl="/pro" />
             </div>
          </div>
        </>
-      )
+      )      
   }
 
 export default propage;
