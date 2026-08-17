@@ -6,6 +6,7 @@ import HowItWorks from "@/components/landing/HowItWorks";
 import PricingSection from "@/components/landing/PricingSection";
 import WhatToAsk from "@/components/landing/WhatToAsk";
 import { syncUser } from "@/lib/actions/users";
+// import { auth } from "@clerk/nextjs/server";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 export const dynamic = "force-dynamic";
