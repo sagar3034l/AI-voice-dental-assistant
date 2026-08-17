@@ -43,7 +43,7 @@ export async function POST(request: Request) {
         appointmentType,
         duration,
         price,
-      }),
+      }), 
     });
 
     if (error) {

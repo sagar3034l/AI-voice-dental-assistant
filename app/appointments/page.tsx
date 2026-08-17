@@ -27,6 +27,8 @@ function AppointmentPage() {
     const bookeAppointmetMutation = useBookAppointments();
     const { data: userAppointments = [], isLoading: userAppointmentsLoading } = useUserAppointment();
 
+    console.log(userAppointments)
+
 
     const handleSelectDentist = (doctorId: string) => {
         setSelectedDentistId(doctorId);
@@ -166,7 +168,7 @@ function AppointmentPage() {
                             Loading your appointments...
                         </CardContent>
                     </Card>
-                ) : userAppointments.length === 0 ? (
+                ) : userAppointments?.length === 0 ? (
                     <Card>
                         <CardContent className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
                             <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted/40">

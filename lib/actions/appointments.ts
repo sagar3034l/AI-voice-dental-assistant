@@ -2,16 +2,17 @@
 
 import { auth } from "@clerk/nextjs/server";
 import prisma from "../prisma"
+import { AppointmentStatus } from "@/app/generated/prisma/enums";
 
 
-function transformAppointments(appointment: any){
+function transformAppointments(appointment: any) {
     return {
         ...appointment,
         patientName: `${appointment.user.firstName || ""} ${appointment.user.lastName}`.trim(),
         patientEmail: appointment.user.email,
         doctorName: appointment.doctor.name,
         doctorImageUrl: appointment.doctor.imageUrl || "",
-        date: appointment.date.toISOString().split("T")[0]  
+        date: appointment.date.toISOString().split("T")[0]
     }
 }
 
@@ -33,34 +34,34 @@ export async function getAppointments() {
                     }
                 }
             },
-            orderBy: {createdAt: "desc"}
+            orderBy: { createdAt: "desc" }
         })
-        return appointments;    
+        return appointments.map(transformAppointments)
     } catch (error) {
-        console.log("Error fetching appointments",error)
+        console.log("Error fetching appointments", error)
         throw new Error("Error fetching appointments")
     }
 }
 
 export async function getUserAppointments() {
     try {
-        const {userId} = await auth();
+        const { userId } = await auth();
 
-        if(!userId) return []
-        
+        if (!userId) return []
+
         const user = await prisma.user.findUnique({
-            where: {clerkId: userId}
+            where: { clerkId: userId }
         })
 
-        if(!user) return []
+        if (!user) return []
 
         const appointments = await prisma.appointment.findMany({
-            where: {userId: user.id},
+            where: { userId: user.id },
             include: {
-                user: {select: {firstName:true,lastName: true,email: true}},
-                doctor: {select: {name: true, imageUrl: true}}
+                user: { select: { firstName: true, lastName: true, email: true } },
+                doctor: { select: { name: true, imageUrl: true } }
             },
-            orderBy: [{date:"asc"},{time: "asc"}]
+            orderBy: [{ date: "asc" }, { time: "asc" }]
         })
         return appointments.map(transformAppointments)
     } catch (error) {
@@ -69,19 +70,19 @@ export async function getUserAppointments() {
     }
 }
 
-export async function getUserAppointmentStats(){
+export async function getUserAppointmentStats() {
     try {
-        const {userId} = await auth();
+        const { userId } = await auth();
 
-        if(!userId) return {
+        if (!userId) return {
             totalAppointments: 0,
             completedAppointments: 0
         }
 
         const user = await prisma.user.findUnique({
-            where: {clerkId: userId}
+            where: { clerkId: userId }
         })
-        if(!user){
+        if (!user) {
             return {
                 totalAppointments: 0,
                 completedAppointments: 0
@@ -89,14 +90,14 @@ export async function getUserAppointmentStats(){
         }
 
         // this calls are run in parellal instead of waiting
-        const [totalCount,completedCount] = await Promise.all([
+        const [totalCount, completedCount] = await Promise.all([
             prisma.appointment.count({
-                where:{
+                where: {
                     userId: user.id
                 }
             }),
             prisma.appointment.count({
-                where:{
+                where: {
                     userId: user.id,
                     status: "COMPLETED"
                 }
@@ -118,26 +119,26 @@ export async function getUserAppointmentStats(){
 }
 
 
-export async function getBookedTimeSlots(doctorId: string, date: string){
-     try {
+export async function getBookedTimeSlots(doctorId: string, date: string) {
+    try {
         const appointments = await prisma.appointment.findMany({
             where: {
                 doctorId,
                 date: new Date(date),
                 status: {
-                    in: ["CONFIRMED","COMPLETED"]
+                    in: ["CONFIRMED", "COMPLETED"]
                 }
             },
-            select: {time: true}
+            select: { time: true }
         })
 
-        return appointments.map((appointment)=> appointment.time)
-     } catch (error) {
+        return appointments.map((appointment) => appointment.time)
+    } catch (error) {
         console.error(error)
-     }
+    }
 }
 
-interface BookAppointmentInput  {
+interface BookAppointmentInput {
     doctorId: string
     date: string,
     time: string,
@@ -146,25 +147,25 @@ interface BookAppointmentInput  {
 
 export async function bookAppointMent(input: BookAppointmentInput) {
     try {
-        const {userId} = await auth()
-        if(!userId)throw new Error("You are not authorized by this application")
+        const { userId } = await auth()
+        if (!userId) throw new Error("You are not authorized by this application")
 
-        if(!input.doctorId || !input.date || !input.time){
+        if (!input.doctorId || !input.date || !input.time) {
             throw new Error("All this field are required");
         }
 
-        const user = await prisma.user.findUnique({where:{clerkId: userId}});
+        const user = await prisma.user.findUnique({ where: { clerkId: userId } });
 
-        if(!user) throw new Error("User not found in the database you are a fake user");
+        if (!user) throw new Error("User not found in the database you are a fake user");
 
         const newAppointMent = await prisma.appointment.create({
-            data:{
-               userId: user.id,
-               doctorId: input.doctorId,
-               date: new Date(input.date),
-               time: input.time,
-               reason: input.reason || "Genral consultant",
-               status: "CONFIRMED"
+            data: {
+                userId: user.id,
+                doctorId: input.doctorId,
+                date: new Date(input.date),
+                time: input.time,
+                reason: input.reason || "Genral consultant",
+                status: "CONFIRMED"
             },
             include: {
                 user: {
@@ -174,10 +175,26 @@ export async function bookAppointMent(input: BookAppointmentInput) {
                         email: true
                     }
                 },
-                doctor: {select: {name: true, imageUrl: true}}
+                doctor: { select: { name: true, imageUrl: true } }
             }
         })
         return transformAppointments(newAppointMent)
+    } catch (error) {
+        console.error("Error booking appointment:", error);
+        throw error
+    }
+}
+
+export async function updateAppointmentStatus(input: { id: string, status: AppointmentStatus }) {
+    try {
+        const appointment = await prisma.appointment.update({
+            where: { id: input.id },
+            data: {
+                status: input.status
+            },
+        })
+
+        return appointment;
     } catch (error) {
         console.error("Error booking appointment:", error);
         throw error
